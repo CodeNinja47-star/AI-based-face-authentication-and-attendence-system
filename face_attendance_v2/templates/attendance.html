@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block page_title %}Attendance Records{% endblock %}
+{% block content %}
+<div class="card">
+  <div class="flex-row" style="margin-bottom:20px">
+    <div>
+      <label style="font-weight:600;margin-right:8px">📅 Select Date:</label>
+      <input type="date" id="dateInput" value="{{ target_date }}" onchange="loadDate(this.value)"
+        style="padding:8px 12px;border:1px solid #ddd;border-radius:8px;font-size:.9rem">
+    </div>
+    <div class="flex-row" style="margin-left:auto">
+      <a href="/attendance/export?date={{ target_date }}" class="btn btn-primary btn-sm"><i class="fas fa-file-csv"></i> CSV</a>
+      <a href="/attendance/pdf?date={{ target_date }}" class="btn btn-warn btn-sm"><i class="fas fa-file-pdf"></i> PDF</a>
+    </div>
+  </div>
+  <p style="color:#888;font-size:.85rem;margin-bottom:16px">{{ rows|length }} record(s) for {{ target_date }}</p>
+  {% if rows %}
+  <table>
+    <thead><tr><th>#</th><th>Emp ID</th><th>Name</th><th>Check-In</th><th>Check-Out</th><th>Status</th></tr></thead>
+    <tbody>
+      {% for r in rows %}
+      <tr>
+        <td>{{ loop.index }}</td><td>{{ r.emp_id }}</td><td>{{ r.name }}</td>
+        <td>{{ r.check_in or '—' }}</td><td>{{ r.check_out or '—' }}</td>
+        <td><span class="badge badge-{{ r.status.lower() }}">{{ r.status }}</span></td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+    <p style="text-align:center;padding:40px;color:#aaa">No records found for this date.</p>
+  {% endif %}
+</div>
+{% endblock %}
+{% block scripts %}
+<script>function loadDate(d){window.location='/attendance?date='+d}</script>
+{% endblock %}

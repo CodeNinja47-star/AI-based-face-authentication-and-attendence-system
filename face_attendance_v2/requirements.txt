@@ -1,0 +1,22 @@
+# Face Authentication + Attendance System v2
+# Python 3.8+ required
+
+# Core
+opencv-python>=4.8.0
+numpy>=1.24.0
+Pillow>=10.0.0
+
+# Face recognition (recommended)
+# Install separately if dlib fails:
+#   pip install cmake dlib face_recognition
+face-recognition>=1.3.0
+
+# Web dashboard
+Flask>=3.0.0
+
+# PDF reports
+reportlab>=4.0.0
+
+# Optional: deep learning face recognition (better accuracy)
+# deepface>=0.0.79
+# tensorflow>=2.13.0

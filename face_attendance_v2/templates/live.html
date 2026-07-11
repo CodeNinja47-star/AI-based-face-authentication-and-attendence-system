@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block page_title %}Live Camera{% endblock %}
+{% block content %}
+<div class="card" style="max-width:600px">
+  <h3><i class="fas fa-camera"></i> Live Face Recognition</h3>
+  <p style="color:#666;font-size:.9rem;margin-bottom:20px">
+    Open camera to automatically mark attendance. Liveness detection (blink) prevents spoofing.
+  </p>
+  <div class="flex-row" style="margin-bottom:20px">
+    <button class="btn btn-success" onclick="startCamera('checkin')"><i class="fas fa-sign-in-alt"></i> Check-In Mode</button>
+    <button class="btn btn-warn" onclick="startCamera('checkout')"><i class="fas fa-sign-out-alt"></i> Check-Out Mode</button>
+  </div>
+  <div id="status" style="display:none" class="alert alert-info"></div>
+  <div class="card" style="background:#f8fafc;border:1px dashed #cbd5e0">
+    <h3 style="margin-bottom:12px">💡 How It Works</h3>
+    <ul style="font-size:.9rem;color:#555;line-height:2">
+      <li>A camera window will open on your screen</li>
+      <li>Stand in front of camera — face will be auto-detected</li>
+      <li><b>Blink naturally</b> to pass liveness check (anti-spoof)</li>
+      <li>Attendance is marked automatically on recognition</li>
+      <li>Press <b>Q</b> in the camera window to stop</li>
+    </ul>
+  </div>
+  <div class="card" style="background:#fff3cd;border:1px solid #ffc107;margin-top:0">
+    <b>⏰ Late Detection:</b> Check-ins after 9:00 AM are marked as <span class="badge badge-late">LATE</span>
+  </div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+function startCamera(mode) {
+  const s = document.getElementById('status');
+  s.style.display = 'block';
+  s.textContent = '📷 Opening camera in ' + (mode === 'checkin' ? 'Check-In' : 'Check-Out') + ' mode...';
+  fetch('/start_camera/' + mode)
+    .then(r => r.json())
+    .then(d => {
+      if (d.status === 'started') {
+        s.textContent = '✅ Camera started! Look for the OpenCV window on your screen.';
+      } else {
+        s.textContent = '⚠️ Camera is already running. Check your screen.';
+      }
+    });
+}
+</script>
+{% endblock %}

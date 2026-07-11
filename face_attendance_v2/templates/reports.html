@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+{% block title %}Reports{% endblock %}
+{% block page_title %}📊 Reports & Analytics{% endblock %}
+{% block content %}
+
+<div style="display:flex;gap:12px;margin-bottom:20px;flex-wrap:wrap">
+  <a href="{{ url_for('daily_pdf') }}" class="btn btn-danger"><i class="fas fa-file-pdf"></i> Today's PDF Report</a>
+  <a href="{{ url_for('monthly_pdf') }}" class="btn btn-primary"><i class="fas fa-calendar-alt"></i> Monthly PDF Report</a>
+  <a href="{{ url_for('alert_low_attendance') }}" class="btn btn-warning"
+     onclick="return confirm('Send email alerts to all students below {{ threshold }}%?')">
+    <i class="fas fa-bell"></i> Send Low-Attendance Alerts
+  </a>
+</div>
+
+<div class="card">
+  <div class="card-header">
+    <h3>📉 Monthly Attendance — {{ month }}</h3>
+    <span style="font-size:.85rem;color:#888">Threshold: <b>{{ threshold }}%</b></span>
+  </div>
+  <div class="card-body" style="padding:0">
+    <table>
+      <thead><tr><th>#</th><th>ID</th><th>Name</th><th>Dept</th><th>Present</th><th>Total Days</th><th>Percentage</th><th>Status</th></tr></thead>
+      <tbody>
+        {% for s in stats %}
+        <tr>
+          <td>{{ loop.index }}</td>
+          <td>{{ s.emp_id }}</td>
+          <td><b>{{ s.name }}</b></td>
+          <td>{{ s.department or '—' }}</td>
+          <td>{{ s.present }}</td>
+          <td>{{ s.total }}</td>
+          <td>
+            <div style="display:flex;align-items:center;gap:8px">
+              <div class="progress" style="width:80px">
+                <div class="progress-bar"
+                     style="width:{{ s.percentage }}%;background:{% if s.percentage>=75 %}#27AE60{% elif s.percentage>=50 %}#E67E22{% else %}#E74C3C{% endif %}">
+                </div>
+              </div>
+              <span style="font-weight:600;{% if s.percentage<threshold %}color:#e74c3c{% endif %}">{{ s.percentage }}%</span>
+            </div>
+          </td>
+          <td>
+            {% if s.percentage >= threshold %}
+              <span class="badge badge-green">✓ OK</span>
+            {% else %}
+              <span class="badge badge-red">⚠ LOW</span>
+            {% endif %}
+          </td>
+        </tr>
+        {% else %}
+        <tr><td colspan="8" style="text-align:center;padding:30px;color:#aaa">No data.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+{% if low_attendance %}
+<div class="card" style="border-left:4px solid #e74c3c">
+  <div class="card-header"><h3 style="color:#e74c3c">⚠️ Low Attendance Alert — {{ low_attendance|length }} student(s)</h3></div>
+  <div class="card-body">
+    {% for s in low_attendance %}
+    <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #f0f0f0">
+      <span><b>{{ s.name }}</b> ({{ s.emp_id }})</span>
+      <span style="color:#e74c3c;font-weight:700">{{ s.percentage }}%</span>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+{% endif %}
+{% endblock %}

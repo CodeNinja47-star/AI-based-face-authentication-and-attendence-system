@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block page_title %}Users{% endblock %}
+{% block content %}
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+  <p style="color:#666">{{ user_stats|length }} registered user(s)</p>
+  <a href="/users/add" class="btn btn-success"><i class="fas fa-user-plus"></i> Add New User</a>
+</div>
+<div class="card">
+  <table>
+    <thead><tr><th>#</th><th>Emp ID</th><th>Name</th><th>Department</th><th>Email</th><th>Monthly %</th><th>Actions</th></tr></thead>
+    <tbody>
+      {% for us in user_stats %}
+      {% set u = us.user %}
+      <tr>
+        <td>{{ loop.index }}</td>
+        <td>{{ u.emp_id }}</td>
+        <td><a href="/users/{{ u.emp_id }}" style="color:#1a3c5e;font-weight:500">{{ u.name }}</a></td>
+        <td>{{ u.department or '—' }}</td>
+        <td>{{ u.email or '—' }}</td>
+        <td>
+          <div style="display:flex;align-items:center;gap:8px;min-width:120px">
+            <div class="progress-bar" style="flex:1">
+              <div class="progress-fill {{ 'low' if us.pct < 75 else ('warn' if us.pct < 90 else '') }}"
+                   style="width:{{ us.pct }}%"></div>
+            </div>
+            <span style="font-size:.8rem;font-weight:700;color:{{ '#e74c3c' if us.pct < 75 else '#2ecc71' }}">{{ us.pct }}%</span>
+          </div>
+        </td>
+        <td>
+          <a href="/users/{{ u.emp_id }}" class="btn btn-primary btn-sm"><i class="fas fa-eye"></i></a>
+          <a href="/users/delete/{{ u.emp_id }}" class="btn btn-danger btn-sm"
+             onclick="return confirm('Delete {{ u.name }}?')"><i class="fas fa-trash"></i></a>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

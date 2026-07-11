@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block title %}Audit Log{% endblock %}
+{% block page_title %}🛡️ Audit Log{% endblock %}
+{% block content %}
+<div class="card">
+  <div class="card-header"><h3>Recent Actions (last 200)</h3></div>
+  <div class="card-body" style="padding:0">
+    <table>
+      <thead><tr><th>#</th><th>Action</th><th>Performed By</th><th>Details</th><th>Timestamp</th></tr></thead>
+      <tbody>
+        {% for log in logs %}
+        <tr>
+          <td>{{ loop.index }}</td>
+          <td><span class="badge badge-blue">{{ log.action }}</span></td>
+          <td>{{ log.performed_by }}</td>
+          <td>{{ log.details or '—' }}</td>
+          <td style="font-size:.8rem;color:#888">{{ log.timestamp[:19].replace('T',' ') }}</td>
+        </tr>
+        {% else %}
+        <tr><td colspan="5" style="text-align:center;padding:30px;color:#aaa">No audit entries.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

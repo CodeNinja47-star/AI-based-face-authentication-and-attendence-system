@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% block page_title %}Dashboard{% endblock %}
+{% block extra_css %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+{% endblock %}
+{% block content %}
+<div class="stat-grid">
+  <div class="stat-card"><div class="num">{{ total_users }}</div><div class="lbl"><i class="fas fa-users"></i> Total Registered</div></div>
+  <div class="stat-card green"><div class="num">{{ present }}</div><div class="lbl"><i class="fas fa-check-circle"></i> Present Today</div></div>
+  <div class="stat-card orange"><div class="num">{{ late }}</div><div class="lbl"><i class="fas fa-clock"></i> Late Today</div></div>
+  <div class="stat-card red"><div class="num">{{ absent }}</div><div class="lbl"><i class="fas fa-times-circle"></i> Absent Today</div></div>
+</div>
+
+<div style="display:grid;grid-template-columns:2fr 1fr;gap:20px">
+  <div class="card">
+    <h3><i class="fas fa-chart-line"></i> Weekly Attendance (Last 7 Days)</h3>
+    <canvas id="weekChart" height="200"></canvas>
+  </div>
+  <div class="card">
+    <h3><i class="fas fa-exclamation-triangle" style="color:#e74c3c"></i> Low Attendance (&lt;75%)</h3>
+    {% if low_att %}
+      {% for u in low_att %}
+        <div style="margin-bottom:14px">
+          <div style="display:flex;justify-content:space-between;font-size:.85rem;margin-bottom:4px">
+            <span>{{ u.name }}</span><span style="color:#e74c3c;font-weight:700">{{ u.percentage }}%</span>
+          </div>
+          <div class="progress-bar"><div class="progress-fill low" style="width:{{ u.percentage }}%"></div></div>
+        </div>
+      {% endfor %}
+    {% else %}
+      <p style="color:#888;font-size:.9rem;padding:20px 0;text-align:center">✅ All users have good attendance</p>
+    {% endif %}
+  </div>
+</div>
+
+<div class="card">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+    <h3 style="margin:0"><i class="fas fa-calendar-day"></i> Today's Attendance — {{ today }}</h3>
+    <div class="flex-row">
+      <a href="/live" class="btn btn-success btn-sm"><i class="fas fa-camera"></i> Open Camera</a>
+      <a href="/attendance/export?date={{ today }}" class="btn btn-primary btn-sm"><i class="fas fa-download"></i> Export CSV</a>
+      <a href="/attendance/pdf?date={{ today }}" class="btn btn-warn btn-sm"><i class="fas fa-file-pdf"></i> PDF</a>
+    </div>
+  </div>
+  {% if today_rows %}
+  <table>
+    <thead><tr><th>#</th><th>Emp ID</th><th>Name</th><th>Check-In</th><th>Check-Out</th><th>Status</th></tr></thead>
+    <tbody>
+      {% for r in today_rows %}
+      <tr>
+        <td>{{ loop.index }}</td><td>{{ r.emp_id }}</td><td>{{ r.name }}</td>
+        <td>{{ r.check_in or '—' }}</td><td>{{ r.check_out or '—' }}</td>
+        <td><span class="badge badge-{{ r.status.lower() }}">{{ r.status }}</span></td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+    <p style="color:#888;text-align:center;padding:30px">No attendance records yet today.</p>
+  {% endif %}
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+fetch('/api/weekly_chart').then(r=>r.json()).then(d=>{
+  new Chart(document.getElementById('weekChart'),{
+    type:'bar',
+    data:{labels:d.labels,
+      datasets:[
+        {label:'Present',data:d.present,backgroundColor:'#2ecc71',borderRadius:6},
+        {label:'Late',   data:d.late,   backgroundColor:'#f39c12',borderRadius:6}
+      ]},
+    options:{plugins:{legend:{position:'top'}},scales:{y:{beginAtZero:true,ticks:{stepSize:1}}},responsive:true}
+  });
+});
+</script>
+{% endblock %}
