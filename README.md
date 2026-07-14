@@ -1,3 +1,4 @@
+<img width="1920" height="1080" alt="Screenshot 2026-07-14 194254" src="https://github.com/user-attachments/assets/ee8ba818-bfae-4ef1-a4a4-9b26a4256c46" />
 # 📸 AI-Based Face Authentication & Attendance System
 
 Welcome to the AI-Based Face Authentication and Attendance System! This project automates the attendance process by using Artificial Intelligence and Computer Vision to detect, recognize, and mark the attendance of individuals in real-time.
